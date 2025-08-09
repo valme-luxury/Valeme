@@ -1,0 +1,381 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Valme - Premium Luxury Accessories for Industry Professionals. Explore exquisite bags, goggles, makeup, and accessories.">
+    <meta name="keywords" content="luxury accessories, Valme, premium bags, designer goggles, luxury makeup, wholesale accessories, high-end fashion">
+    <meta name="author" content="Valme">
+    <meta name="robots" content="index, follow">
+    <title>Valme - Exquisite Luxury Accessories</title>
+    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.20.15/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Lato', sans-serif;
+        }
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .animate-fadeInUp {
+            animation: fadeInUp 1.2s ease-out forwards;
+        }
+        .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+        .hover-scale {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .hover-scale:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+            return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+            if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+                try {
+                    var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                    var firstSheetName = workbook.SheetNames[0];
+                    var worksheet = workbook.Sheets[firstSheetName];
+                    var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                    var filteredData = jsonData.filter(row => row.some(filledCell));
+                    var headerRowIndex = filteredData.findIndex((row, index) =>
+                        row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                    );
+                    if (headerRowIndex === -1 || headerRowIndex > 25) {
+                        headerRowIndex = 0;
+                    }
+                    var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+                    csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                    return { csv, data: filteredData.slice(headerRowIndex) };
+                } catch (e) {
+                    console.error(e);
+                    return { csv: "", data: [] };
+                }
+            }
+            return { csv: gk_fileData[filename] || "", data: [] };
+        }
+    </script>
+    <script type="text/babel">
+        function Navbar() {
+            return (
+                <header className="bg-sapphire-900 text-white fixed w-full top-0 z-50 shadow-xl">
+                    <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+                        <div className="text-3xl font-bold tracking-wider uppercase font-playfair">Valme</div>
+                        <ul className="flex space-x-8">
+                            {['Home', 'Products', 'Catalog', 'About', 'Contact'].map((item) => (
+                                <li key={item}>
+                                    <a href={`#${item.toLowerCase()}`} className="text-lg hover:text-rose-400 transition-colors duration-300 font-lato" aria-label={`Navigate to ${item} section`}>
+                                        {item}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </nav>
+                </header>
+            );
+        }
+
+        function Hero() {
+            return (
+                <section id="home" className="h-screen bg-cover bg-center flex items-center justify-center text-white relative" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1615396899655-80b2e65d60bd')" }}>
+                    <div className="absolute inset-0 bg-sapphire-900 opacity-50"></div>
+                    <div className="text-center relative z-10 animate-fadeInUp">
+                        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight uppercase mb-4 font-playfair">Valme Elegance</h1>
+                        <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto font-lato">Discover luxury accessories crafted for industry professionals and retailers.</p>
+                        <a href="#products" className="inline-block bg-rose-400 text-sapphire-900 font-semibold py-3 px-8 rounded-lg hover:bg-rose-500 transition-colors duration-300 animate-pulse font-lato">Explore Collections</a>
+                    </div>
+                </section>
+            );
+        }
+
+        function ProductCard({ image, title, description, price }) {
+            return (
+                <div className="bg-ivory-50 rounded-xl shadow-lg overflow-hidden hover-scale bg-gradient-to-b from-ivory-100 to-ivory-50">
+                    <img src={image} alt={title} className="w-full h-72 object-cover"/>
+                    <div className="p-6">
+                        <h3 className="text-2xl font-semibold mb-2 font-playfair text-sapphire-900">{title}</h3>
+                        <p className="text-gray-600 mb-4 font-lato">{description}</p>
+                        <p className="text-xl font-bold text-rose-600 font-lato">${price}</p>
+                        <a href="#contact" className="mt-4 inline-block bg-sapphire-900 text-white py-2 px-6 rounded-lg hover:bg-sapphire-800 transition-colors font-lato">Inquire Now</a>
+                    </div>
+                </div>
+            );
+        }
+
+        function Products() {
+            const products = [
+                {
+                    image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa",
+                    title: "Chic Leather Handbag",
+                    description: "Handcrafted with premium Italian leather for timeless elegance.",
+                    price: "349.00"
+                },
+                {
+                    image: "https://images.unsplash.com/photo-1588117472013-59bb28a56385",
+                    title: "Rose Gold Goggles",
+                    description: "Sleek, UV-protective lenses with a luxurious rose gold frame.",
+                    price: "179.00"
+                },
+                {
+                    image: "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3",
+                    title: "Luxury Makeup Palette",
+                    description: "Vibrant, long-lasting colors for a flawless look.",
+                    price: "99.00"
+                },
+                {
+                    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c",
+                    title: "Diamond Necklace",
+                    description: "A dazzling statement piece for any occasion.",
+                    price: "249.00"
+                }
+            ];
+
+            return (
+                <section id="products" className="py-20 bg-ivory-100">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <h2 className="text-5xl font-bold text-center mb-12 animate-fadeInUp font-playfair text-sapphire-900">Our Signature Collections</h2>
+                        <p className="text-lg text-center mb-8 font-lato text-gray-700">Perfect for retail and wholesale. Contact us for bulk pricing.</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                            {products.map((product, index) => (
+                                <ProductCard key={index} {...product} />
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        }
+
+        function Catalog() {
+            const [fileData, setFileData] = React.useState([]);
+            const handleFileUpload = (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    gk_fileData[file.name] = e.target.result.split(',')[1];
+                    gk_isXlsx = file.name.endsWith('.xlsx');
+                    gk_xlsxFileLookup[file.name] = true;
+                    const result = loadFileData(file.name);
+                    setFileData(result.data);
+                };
+                reader.readAsDataURL(file);
+            };
+
+            return (
+                <section id="catalog" className="py-20 bg-ivory-50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center animate-fadeInUp">
+                        <h2 className="text-5xl font-bold mb-6 font-playfair text-sapphire-900">Product Catalog</h2>
+                        <p className="text-lg text-gray-700 mb-6 font-lato">Upload an XLSX or CSV file to view our latest product catalog.</p>
+                        <input type="file" accept=".xlsx,.csv" onChange={handleFileUpload} className="mb-6 p-2 border rounded-lg font-lato" aria-label="Upload product catalog file" />
+                        {fileData.length > 0 && (
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full bg-ivory-50 border border-sapphire-200">
+                                    <thead>
+                                        <tr className="bg-sapphire-900 text-white">
+                                            {fileData[0].map((header, index) => (
+                                                <th key={index} className="py-3 px-4 border font-lato">{header}</th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {fileData.slice(1).map((row, rowIndex) => (
+                                            <tr key={rowIndex} className="border hover:bg-ivory-100">
+                                                {row.map((cell, cellIndex) => (
+                                                    <td key={cellIndex} className="py-3 px-4 border font-lato">{cell}</td>
+                                                ))}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
+                </section>
+            );
+        }
+
+        function About() {
+            return (
+                <section id="about" className="py-20 bg-ivory-50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center animate-fadeInUp">
+                        <h2 className="text-5xl font-bold mb-6 font-playfair text-sapphire-900">The Valme Experience</h2>
+                        <p className="text-lg text-gray-700 max-w-3xl mx-auto font-lato">
+                            Valme delivers unparalleled luxury to retailers and fashion professionals worldwide. 
+                            Our handcrafted accessories blend sophistication with timeless elegance.
+                        </p>
+                    </div>
+                </section>
+            );
+        }
+
+        function Contact() {
+            return (
+                <section id="contact" className="py-20 bg-sapphire-900 text-white">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center animate-fadeInUp">
+                        <h2 className="text-5xl font-bold mb-6 font-playfair">Connect with Valme</h2>
+                        <p className="text-lg mb-4 font-lato">Email: contact@valme.com</p>
+                        <p className="text-lg mb-4 font-lato">Phone: +1-800-VALME</p>
+                        <p className="text-lg mb-6 font-lato">Join our community for exclusive wholesale offers and updates.</p>
+                        <div className="flex justify-center space-x-6 mb-6">
+                            <a href="https://instagram.com" className="text-rose-400 hover:text-rose-500 text-lg font-lato" aria-label="Visit Valme on Instagram">Instagram</a>
+                            <a href="https://twitter.com" className="text-rose-400 hover:text-rose-500 text-lg font-lato" aria-label="Visit Valme on Twitter">Twitter</a>
+                            <a href="https://facebook.com" className="text-rose-400 hover:text-rose-500 text-lg font-lato" aria-label="Visit Valme on Facebook">Facebook</a>
+                        </div>
+                        <div>
+                            <h3 className="text-2xl font-semibold mb-4 font-playfair">Newsletter Signup</h3>
+                            <input type="email" placeholder="Enter your email" className="py-2 px-4 rounded-lg text-sapphire-900 font-lato" aria-label="Email for newsletter" />
+                            <button className="ml-2 bg-rose-400 text-sapphire-900 py-2 px-6 rounded-lg hover:bg-rose-500 font-lato">Subscribe</button>
+                        </div>
+                    </div>
+                </section>
+            );
+        }
+
+        function Footer() {
+            return (
+                <footer className="bg-sapphire-800 text-white py-8">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                        <p className="font-lato">&copy; 2025 Valme. All Rights Reserved.</p>
+                    </div>
+                </footer>
+            );
+        }
+
+        function App() {
+            return (
+                <div>
+                    <Navbar />
+                    <Hero />
+                    <Products />
+                    <Catalog />
+                    <About />
+                    <Contact />
+                    <Footer />
+                </div>
+            );
+        }
+
+        // Custom Tailwind colors
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sapphire: {
+                            800: '#1b263b',
+                            900: '#0d1b2a'
+                        },
+                        rose: {
+                            400: '#ff6f61',
+                            500: '#e63946',
+                            600: '#d00000'
+                        },
+                        ivory: {
+                            50: '#fff8e6',
+                            100: '#fff1cc'
+                        }
+                    },
+                    fontFamily: {
+                        playfair: ['Playfair Display', 'serif'],
+                        lato: ['Lato', 'sans-serif']
+                    }
+                }
+            }
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Valme",
+        "url": "https://valme-website.netlify.app",
+        "logo": "https://images.unsplash.com/photo-1615396899655-80b2e65d60bd",
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+1-800-VALME",
+            "contactType": "customer service",
+            "email": "contact@valme.com"
+        },
+        "sameAs": [
+            "https://instagram.com",
+            "https://twitter.com",
+            "https://facebook.com"
+        ]
+    }
+    </script>
+</body>
+</html>
